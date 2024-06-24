@@ -6,6 +6,8 @@ on:
       - master
       - test
   workflow_dispatch:
+  schedule:
+    - cron: '05 17 * * *'
 
 permissions: write-all
 
