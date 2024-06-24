@@ -26,13 +26,13 @@ jobs:
             BRANCH_NAME=$GITHUB_HEAD_REF
           fi
           echo "BRANCH_NAME=$BRANCH_NAME"
-          echo "::set-output name=branch::$BRANCH_NAME"
+          echo "branch=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Run Dependabot
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_BRANCH: ${{ steps.extract_branch.outputs.branch }}
+          TARGET_BRANCH: ${{ env.branch }}
           PACKAGE_MANAGER: "maven"
         run: |
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
