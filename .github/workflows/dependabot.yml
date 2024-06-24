@@ -42,7 +42,7 @@ jobs:
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_BRANCH: ${{ matrix.branch }}
+          TARGET_BRANCH: "${{ matrix.branch }}"
           PACKAGE_MANAGER: "maven"
         run: |
           echo "$TARGET_BRANCH"
