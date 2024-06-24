@@ -31,6 +31,9 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           PACKAGE_MANAGER: "maven"
         run: |
+          export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
+          export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
+          export PACKAGE_MANAGER=$PACKAGE_MANAGER
           rm -rf dependabot-core
           git clone https://github.com/GCbeheo/dependabot-core
           cd dependabot-core
