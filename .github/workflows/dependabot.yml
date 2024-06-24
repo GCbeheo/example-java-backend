@@ -41,18 +41,21 @@ jobs:
       matrix:
         branch: ${{fromJson(needs.prepare.outputs.matrix)}}
     steps:
+      - name: Set Target Branch
+        run: |
+          echo "TARGET_BRANCH=${{ matrix.branch }}" >> $GITHUB_ENV
+
       - name: Run Dependabot
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_BRANCH: ${{ matrix.branch }}
+          TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
           PACKAGE_MANAGER: "maven"
         run: |
-          echo $TARGET_BRANCH
-          echo "$TARGET_BRANCH"
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
           export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
           export PACKAGE_MANAGER=$PACKAGE_MANAGER
+          export TARGET_BRANCH=$TARGET_BRANCH
           rm -rf dependabot-core
           git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
