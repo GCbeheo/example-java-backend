@@ -51,5 +51,5 @@ jobs:
           rm -rf dependabot-core
           git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
-          chmod +x bin/docker-dev-shell-gh
+          chmod +x bin/docker-dev-shell
           bin/docker-dev-shell $PACKAGE_MANAGER bin/dry-run.rb $PACKAGE_MANAGER $GITHUB_REPOSITORY --branch $TARGET_BRANCH
