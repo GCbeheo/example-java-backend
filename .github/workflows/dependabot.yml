@@ -49,13 +49,13 @@ jobs:
           PACKAGE_MANAGER: "maven"
         run: |
           echo $TARGET_BRANCH
-#          export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
-#          export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
-#          export PACKAGE_MANAGER=$PACKAGE_MANAGER
-#          export TARGET_BRANCH=$TARGET_BRANCH
-#          rm -rf dependabot-core
-#          git clone https://github.com/tyson-trinh/dependabot-core
-#          cd dependabot-core
-#          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}")|' bin/docker-dev-shell-gh
-#          chmod +x bin/docker-dev-shell-gh
-#          bin/docker-dev-shell-gh $PACKAGE_MANAGER
+          echo "$TARGET_BRANCH"
+          export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
+          export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
+          export PACKAGE_MANAGER=$PACKAGE_MANAGER
+          rm -rf dependabot-core
+          git clone https://github.com/tyson-trinh/dependabot-core
+          cd dependabot-core
+          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}")|' bin/docker-dev-shell-gh
+          chmod +x bin/docker-dev-shell-gh
+          bin/docker-dev-shell-gh $PACKAGE_MANAGER
