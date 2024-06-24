@@ -16,33 +16,30 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v2
-        with:
-          path: dependabot-core/tmp
-          key: ${{ runner.os }}-build-${{ hashFiles('**/tmp/**') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          if [[ "$GITHUB_REF" == refs/heads/* ]]; then
+            BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          elif [[ "$GITHUB_REF" == refs/pull/*/merge ]]; then
+            BRANCH_NAME=$(echo "$GITHUB_HEAD_REF")
+          fi
+          echo "BRANCH_NAME=$BRANCH_NAME"
+          echo "::set-output name=branch::$BRANCH_NAME
 
       - name: Run Dependabot
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          TARGET_BRANCH: ${{ steps.extract_branch.outputs.branch }}
           PACKAGE_MANAGER: "maven"
         run: |
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
           export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
           export PACKAGE_MANAGER=$PACKAGE_MANAGER
           rm -rf dependabot-core
-          git clone https://github.com/GCbeheo/dependabot-core
+          git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
-          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}")|' bin/docker-dev-shell-gh
+          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}")|' bin/docker-dev-shell-gh
           bin/docker-dev-shell-gh $PACKAGE_MANAGER
-
-      - name: Save dependencies to cache
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
-        with:
-          path: dependabot-core/tmp
-          key: ${{ runner.os }}-build-${{ hashFiles('**/tmp/**') }}
