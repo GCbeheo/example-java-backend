@@ -23,10 +23,10 @@ jobs:
           if [[ "$GITHUB_REF" == refs/heads/* ]]; then
             BRANCH_NAME=${GITHUB_REF#refs/heads/}
           elif [[ "$GITHUB_REF" == refs/pull/*/merge ]]; then
-            BRANCH_NAME=$(echo "$GITHUB_HEAD_REF")
+            BRANCH_NAME=$GITHUB_HEAD_REF
           fi
           echo "BRANCH_NAME=$BRANCH_NAME"
-          echo "::set-output name=branch::$BRANCH_NAME
+          echo "::set-output name=branch::$BRANCH_NAME"
 
       - name: Run Dependabot
         env:
