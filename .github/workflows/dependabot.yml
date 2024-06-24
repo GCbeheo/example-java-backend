@@ -2,8 +2,9 @@ name: Dependabot
 
 on:
   workflow_dispatch:
+
   schedule:
-    - '30 18 * * *'
+    - cron: '30 18 * * *'
 
 permissions: write-all
 
