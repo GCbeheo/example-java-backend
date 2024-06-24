@@ -1,0 +1,48 @@
+name: Dependabot
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  dependabot-scan:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: self-hosted
+
+    steps:
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: dependabot-core/tmp
+          key: ${{ runner.os }}-build-${{ hashFiles('**/tmp/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Run Dependabot
+        env:
+          LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PACKAGE_MANAGER: "maven"
+        run: |
+          export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
+          export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
+          export PACKAGE_MANAGER=$PACKAGE_MANAGER
+          rm -rf dependabot-core
+          git clone https://github.com/GCbeheo/dependabot-core
+          cd dependabot-core
+          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}")|' bin/docker-dev-shell-gh
+          bin/docker-dev-shell-gh $PACKAGE_MANAGER
+
+      - name: Save dependencies to cache
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        with:
+          path: dependabot-core/tmp
+          key: ${{ runner.os }}-build-${{ hashFiles('**/tmp/**') }}
