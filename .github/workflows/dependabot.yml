@@ -38,6 +38,7 @@ jobs:
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
           export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
           export PACKAGE_MANAGER=$PACKAGE_MANAGER
+          export TARGET_BRANCH=$TARGET_BRANCH
           rm -rf dependabot-core
           git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
