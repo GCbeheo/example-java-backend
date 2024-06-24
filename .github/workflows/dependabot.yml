@@ -1,6 +1,9 @@
 name: Dependabot
 
 on:
+  push:
+    branches:
+      - release/test-1
   workflow_dispatch:
 
   schedule:
