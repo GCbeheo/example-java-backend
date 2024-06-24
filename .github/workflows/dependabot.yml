@@ -1,41 +1,44 @@
 name: Dependabot
 
 on:
-  push:
-    branches:
-      - master
-      - test
   workflow_dispatch:
   schedule:
-    - cron: '05 17 * * *'
+    - '05 18 * * *'
 
 permissions: write-all
 
 jobs:
-  dependabot-scan:
-    permissions:
-      contents: write
-      pull-requests: write
-    runs-on: self-hosted
-#    if: startsWith(github.ref, 'refs/heads/') && contains(github.ref, 'feature/')
-    steps:
-      - name: Extract branch name
-        id: extract_branch
-        run: |
-          echo "GITHUB_REF=$GITHUB_REF"
-          if [[ "$GITHUB_REF" == refs/heads/* ]]; then
-            BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          elif [[ "$GITHUB_REF" == refs/pull/*/merge ]]; then
-            BRANCH_NAME=$GITHUB_HEAD_REF
-          fi
-          echo "BRANCH_NAME=$BRANCH_NAME"
-          echo "branch=$BRANCH_NAME" >> $GITHUB_ENV
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch release branches
+        run: |
+          git fetch --no-tags --prune --depth=5 origin '+refs/heads/release/*:refs/remotes/origin/release/*'
+
+      - run: |
+          echo "::set-output name=matrix::$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)"
+        id: set-matrix
+
+  dependabot-scan:
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: ${{fromJson(needs.prepare.outputs.matrix)}}
+    steps:
       - name: Run Dependabot
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          TARGET_BRANCH: ${{ env.branch }}
+          TARGET_BRANCH: ${{ matrix.branch }}
           PACKAGE_MANAGER: "maven"
         run: |
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
