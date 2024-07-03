@@ -9,8 +9,6 @@ on:
   schedule:
     - cron: '30 18 * * *'
 
-permissions: write-all
-
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -30,10 +28,6 @@ jobs:
       - run: |
           echo "::save-state name=matrix::$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)"
         id: set-matrix
-
-      - name: Debug output
-        run: |
-          echo "Matrix: ${{ steps.set-matrix.outputs.matrix }}"
 
   dependabot-scan:
     needs: prepare
@@ -65,6 +59,9 @@ jobs:
           rm -rf dependabot-core
           git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
+          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--security-updates-only" "--branch" "${TARGET_BRANCH}")|' bin/docker-dev-shell-gh
+          chmod +x bin/docker-dev-shell-gh
+          bin/docker-dev-shell-gh $PACKAGE_MANAGER
           sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--security-updates-only" "--branch" "${TARGET_BRANCH}")|' bin/docker-dev-shell-gh
           chmod +x bin/docker-dev-shell-gh
           bin/docker-dev-shell-gh $PACKAGE_MANAGER
