@@ -29,6 +29,10 @@ jobs:
           echo "::set-output name=matrix::$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)"
         id: set-matrix
 
+      - name: Debug output
+        run: |
+          echo "Matrix: ${{ steps.set-matrix.outputs.matrix }}"
+
   dependabot-scan:
     needs: prepare
     runs-on: ubuntu-latest
