@@ -29,7 +29,6 @@ jobs:
 #        id: get-branch
 
   version-update:
-    needs: get-release-branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
