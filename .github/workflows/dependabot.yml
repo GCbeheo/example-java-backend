@@ -60,6 +60,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           PACKAGE_MANAGER: "maven"
         run: |
+          ls -la
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
           TARGET_BRANCH=$(echo "${{ matrix.branch }}" | tr -d '  ')
           echo "$TARGET_BRANCH"
