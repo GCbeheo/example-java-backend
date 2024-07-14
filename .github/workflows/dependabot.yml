@@ -47,7 +47,6 @@ jobs:
 
       - name: Echo repository to test
         run: |
-          cd dependabot-core
           echo "${{ github.repository }}"
 
       - name: Echo branch to test
