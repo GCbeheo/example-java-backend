@@ -56,7 +56,7 @@ jobs:
 
       - name: Scan version update with package maven
         env:
-          LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PACKAGE_MANAGER: "maven"
         run: |
