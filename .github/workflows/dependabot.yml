@@ -6,10 +6,10 @@ on:
 permissions: write-all
 
 jobs:
-  prepare:
+  get-release-branch:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      release-branch: ${{ steps.get-branch.outputs.release_branch }}
 
     steps:
       - name: Checkout
@@ -22,22 +22,30 @@ jobs:
           git fetch --no-tags --prune --depth=5 origin '+refs/heads/release/*:refs/remotes/origin/release/*'
 
       - run: |
-          echo "::set-output name=matrix::$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)"
-        id: set-matrix
+#          echo "::set-output name=matrix::$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)"
+          echo "release_branch=$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)" >> $GITHUB_OUTPUT
+        id: get-branch
 
   dependabot-scan:
-    needs: prepare
+    needs: get-release-branch
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     strategy:
       matrix:
-        branch: ${{fromJson(needs.prepare.outputs.matrix)}}
+        branch: ${{fromJson(needs.get-release-branch.outputs.release-branch)}}
     steps:
       - name: Set Target Branch
         run: |
           echo "TARGET_BRANCH=${{ matrix.branch }}" >> $GITHUB_ENV
+
+      - name: Checkout dependabot-core
+        uses: actions/checkout@v4
+        with:
+          repository: tyson-trinh/dependabot-core
+          ref: main
+          path: dependabot-core
 
       - name: Run Dependabot
         env:
@@ -46,14 +54,8 @@ jobs:
           TARGET_BRANCH: ${{ env.TARGET_BRANCH }}
           PACKAGE_MANAGER: "maven"
         run: |
-          export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
-          export GITHUB_REPOSITORY=$GITHUB_REPOSITORY
-          export PACKAGE_MANAGER=$PACKAGE_MANAGER
           TARGET_BRANCH=$(echo "$TARGET_BRANCH" | tr -d ' ')
           echo "$TARGET_BRANCH"
-          export TARGET_BRANCH=$TARGET_BRANCH
-          rm -rf dependabot-core
-          git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
           sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--security-updates-only" "--branch" "${TARGET_BRANCH}")|' bin/docker-dev-shell-gh
           chmod +x bin/docker-dev-shell-gh
