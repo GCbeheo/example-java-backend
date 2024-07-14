@@ -71,6 +71,11 @@ jobs:
           ref: main
           path: dependabot-core
 
+      - name: Echo branch to test
+        run: |
+          cd dependabot-core
+          echo "${{ github.repository }}"
+
       - name: Scan security update with package maven
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
