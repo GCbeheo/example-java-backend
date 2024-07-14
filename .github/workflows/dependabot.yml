@@ -60,6 +60,6 @@ jobs:
           TARGET_BRANCH=$(echo "$TARGET_BRANCH" | tr -d ' ')
           echo "$TARGET_BRANCH"
           cd dependabot-core
-          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--security_updates_only" "--branch" "${TARGET_BRANCH}") |' bin/docker-dev-shell-gh
+          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}") "--security-updates-only" |' bin/docker-dev-shell-gh
           chmod +x bin/docker-dev-shell-gh
           bin/docker-dev-shell-gh $PACKAGE_MANAGER
