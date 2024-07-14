@@ -52,6 +52,7 @@ jobs:
       - name: Echo branch to test
         run: |
           echo "${{ matrix.branch }}"
+          echo "${{ matrix.branch }}" | tr -d '  '
 
       - name: Scan version update with package maven
         env:
@@ -60,7 +61,7 @@ jobs:
           PACKAGE_MANAGER: "maven"
         run: |
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
-          TARGET_BRANCH=$(echo "${{ matrix.branch }}" | tr -d ' ')
+          TARGET_BRANCH=$(echo "${{ matrix.branch }}" | tr -d '  ')
           echo "$TARGET_BRANCH"
           cd dependabot-core
           sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}") |' bin/docker-dev-shell-gh
