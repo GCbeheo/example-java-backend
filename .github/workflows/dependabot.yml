@@ -35,6 +35,9 @@ jobs:
       matrix:
         branch: ${{fromJson(needs.get-release-branch.outputs.release-branch)}}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Checkout dependabot-core
         uses: actions/checkout@v4
         with:
@@ -49,7 +52,6 @@ jobs:
 
       - name: Echo branch to test
         run: |
-          echo "${{ matrix.branch }}"
           echo "${{ matrix.branch }}" | tr -d '  '
 
       - name: Scan version update with package maven
