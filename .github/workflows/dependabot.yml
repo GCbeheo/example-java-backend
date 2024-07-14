@@ -38,38 +38,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-#      - name: Checkout dependabot-core
-#        uses: actions/checkout@v4
-#        with:
-#          repository: tyson-trinh/dependabot-core
-#          ref: main
-#          path: dependabot-core
+      - name: Checkout dependabot-core
+        uses: actions/checkout@v4
+        with:
+          repository: tyson-trinh/dependabot-core
+          ref: main
+          path: dependabot-core
 
       - name: Echo repository to test
         run: |
+          cd dependabot-core
           echo "${{ github.repository }}"
-
       - name: Echo branch to test
         run: |
           echo "${{ matrix.branch }}" | tr -d '  '
-
       - name: Scan version update with package maven
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           PACKAGE_MANAGER: "maven"
         run: |
+          ls -la **
           export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
-          echo $LOCAL_GITHUB_ACCESS_TOKEN
-          echo $GITHUB_REPOSITORY
           TARGET_BRANCH=$(echo "${{ matrix.branch }}" | tr -d '  ')
           echo "$TARGET_BRANCH"
-          git clone https://github.com/tyson-trinh/dependabot-core
           cd dependabot-core
           sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}") |' bin/docker-dev-shell-gh
           chmod +x bin/docker-dev-shell-gh
           bin/docker-dev-shell-gh $PACKAGE_MANAGER
-
 
 #  security-update:
 #    needs: get-release-branch
