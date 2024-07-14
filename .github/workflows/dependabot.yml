@@ -45,21 +45,18 @@ jobs:
           ref: main
           path: dependabot-core
 
-      - name: Echo branch to test
+      - name: export Target Branch to GITHUB ENV
         run: |
-          echo "${{ matrix.branch }}" | tr -d '  '
+          echo "TARGET_BRANCH=${{ matrix.branch }}" | tr -d '  ' >> $GITHUB_ENV
 
-#      - name: Scan version update with package maven
-#        env:
-#          LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          GITHUB_REPOSITORY: ${{ github.repository }}
-#          PACKAGE_MANAGER: "maven"
-#        run: |
-#          ls -la
-#          export LOCAL_GITHUB_ACCESS_TOKEN=$LOCAL_GITHUB_ACCESS_TOKEN
-#          TARGET_BRANCH=$(echo "${{ matrix.branch }}" | tr -d '  ')
-#          echo "$TARGET_BRANCH"
-#          cd dependabot-core
-#          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${TARGET_BRANCH}") |' bin/docker-dev-shell-gh
-#          chmod +x bin/docker-dev-shell-gh
-#          bin/docker-dev-shell-gh $PACKAGE_MANAGER
+      - name: Scan version update with package maven
+        env:
+          LOCAL_GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PACKAGE_MANAGER: "maven"
+        run: |
+          echo ${{ env.TARGET_BRANCH }}
+          cd dependabot-core
+          sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${{ env.TARGET_BRANCH }}") |' bin/docker-dev-shell-gh
+          chmod +x bin/docker-dev-shell-gh
+          bin/docker-dev-shell-gh $PACKAGE_MANAGER
