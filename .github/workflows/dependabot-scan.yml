@@ -16,9 +16,11 @@ on:
       version-update-only:
         required: false
         type: boolean
+        default: true
       security-update-only:
         required: false
         type: boolean
+        default: false
 
 jobs:
   check-type-update:
