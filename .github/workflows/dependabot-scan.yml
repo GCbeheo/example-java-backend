@@ -30,8 +30,8 @@ jobs:
       - name: Validate input flags
         id: validate
         run: |
-          run_version_update=false
-          run_security_update=false
+          run_version_update=""
+          run_security_update=""
           
           if [[ "${{ inputs.version-update-only }}" == "true" ]]; then
             run_version_update=true
