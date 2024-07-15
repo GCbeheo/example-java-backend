@@ -5,13 +5,11 @@ on:
     branches:
       - release/check-2
 
-permissions: write-all
-
 jobs:
   scan-matrix:
     name: Run scan for each release
     uses: ./.github/workflows/dependabot-scan.yml
     with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.ACCESS_TOKEN }}
       runner: ubuntu-latest
       package: maven
