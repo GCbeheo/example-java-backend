@@ -16,11 +16,9 @@ on:
       version-update-only:
         required: false
         type: boolean
-        default: null
       security-update-only:
         required: false
         type: boolean
-        default: null
 
 jobs:
   check-type-update:
@@ -43,7 +41,7 @@ jobs:
             run_security_update=true
           fi
           
-          if [[ "${{ inputs.version-update-only }}" == "null" && "${{ inputs.security-update-only }}" == "null" ]]; then
+          if [[ "${{ inputs.version-update-only }}" == "" && "${{ inputs.security-update-only }}" == "" ]]; then
             run_version_update=true
             run_security_update=true
           fi
