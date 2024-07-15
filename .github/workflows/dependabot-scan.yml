@@ -20,8 +20,6 @@ on:
         required: false
         type: boolean
 
-permissions: write-all
-
 jobs:
   check-type-update:
     runs-on: ubuntu-latest
