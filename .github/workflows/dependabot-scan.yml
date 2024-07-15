@@ -31,8 +31,8 @@ jobs:
     steps:
       - name: Echo input
         run: |
-          echo "version-update-only=${{ inputs.version-update-only }}"
-          echo "security-update-only=${{ inputs.security-update-only }}"
+          echo "input version-update-only = ${{ inputs.version-update-only }}"
+          echo "input security-update-only = ${{ inputs.security-update-only }}"
 
       - name: Check type update
         id: validate
@@ -53,8 +53,8 @@ jobs:
             exit 1
           fi
           
-          echo $run_version_update
-          echo $run_security_update
+          echo "set version-update-only = $run_version_update"
+          echo "set security-update-only = $run_security_update"
           
           echo "run_version_update=${run_version_update}" >> $GITHUB_OUTPUT
           echo "run_security_update=${run_security_update}" >> $GITHUB_OUTPUT
