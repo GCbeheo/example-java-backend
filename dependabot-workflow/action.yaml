@@ -1,0 +1,116 @@
+name: "Dependabot scan"
+
+description: "Scan for version updates and security updates using Dependabot."
+
+inputs:
+  github-token:
+    description: "GitHub token"
+    required: true
+    type: string
+  runner:
+    description: "Runner to use"
+    required: false
+    type: string
+    default: "self-hosted"
+  package:
+    description: "Package manager to use"
+    required: true
+    type: string
+  version-update-only:
+    description: "Flag to run only version updates"
+    required: false
+    type: boolean
+    default: true
+  security-update-only:
+    description: "Flag to run only security updates"
+    required: false
+    type: boolean
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate input flags
+      id: validate
+      shell: bash
+      run: |
+        run_version_update=false
+        run_security_update=false
+        
+        if [[ "${{ inputs.version-update-only }}" == "true" ]]; then
+          run_version_update=true
+        fi
+        
+        if [[ "${{ inputs.security-update-only }}" == "true" ]]; then
+          run_security_update=true
+        fi
+        
+        if [[ "${{ inputs.version-update-only }}" == "false" && "${{ inputs.security-update-only }}" == "false" ]]; then
+          echo "Error: Both version-update-only and security-update-only are false. At least one must be true."
+          exit 1
+        fi
+        
+        echo "set version-update-only = $run_version_update"
+        echo "set security-update-only = $run_security_update"
+        
+        echo "run_version_update=${run_version_update}" >> $GITHUB_OUTPUT
+        echo "run_security_update=${run_security_update}" >> $GITHUB_OUTPUT
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Fetch release branches
+      shell: bash
+      run: |
+        git fetch --no-tags --prune --depth=5 origin '+refs/heads/release/*:refs/remotes/origin/release/*'
+
+    - name: Get release branch
+      id: get-branch
+      shell: bash
+      run: |
+        release_branch=$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)
+        echo "release_branch=${release_branch}" >> $GITHUB_OUTPUT
+
+    - name: Checkout dependabot-core
+      uses: actions/checkout@v4
+      with:
+        repository: tyson-trinh/dependabot-core
+        ref: main
+        path: dependabot-core
+
+    - name: Export Target Branch to GITHUB_ENV
+      shell: bash
+      run: |
+        echo "TARGET_BRANCH=${{ steps.get-branch.outputs.release_branch }}" | tr -d '  ' >> $GITHUB_ENV
+
+    - name: Echo TARGET_BRANCH
+      shell: bash
+      run: echo ${{ env.TARGET_BRANCH }}
+
+    - name: Scan version update with package maven
+      if: ${{ steps.validate.outputs.run_version_update == 'true' }}
+      shell: bash
+      env:
+        LOCAL_GITHUB_ACCESS_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PACKAGE_MANAGER: ${{ inputs.package }}
+      run: |
+        cd dependabot-core
+        sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--branch" "${{ env.TARGET_BRANCH }}") |' bin/docker-dev-shell-gh
+        chmod +x bin/docker-dev-shell-gh
+        bin/docker-dev-shell-gh $PACKAGE_MANAGER
+
+    - name: Scan security update with package maven
+      if: ${{ steps.validate.outputs.run_security_update == 'true' }}
+      shell: bash
+      env:
+        LOCAL_GITHUB_ACCESS_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PACKAGE_MANAGER: ${{ inputs.package }}
+      run: |
+        cd dependabot-core
+        sed -i 's|<CONTAINER_ARGS_HERE>|CONTAINER_ARGS=("bin/dry-run.rb" "${PACKAGE_MANAGER}" "${GITHUB_REPOSITORY}" "--security_updates_only" "--branch" "${{ env.TARGET_BRANCH }}") |' bin/docker-dev-shell-gh
+        chmod +x bin/docker-dev-shell-gh
+        bin/docker-dev-shell-gh $PACKAGE_MANAGER
