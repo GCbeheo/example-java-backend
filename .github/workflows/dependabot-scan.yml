@@ -46,7 +46,7 @@ jobs:
             run_security_update=true
           fi
           
-          if [ "${{ inputs.version-update-only }}" = "false" ] && [ "${{ inputs.security-update-only }}" = "false" ]; then
+          if [[ "${{ inputs.version-update-only }}" == "false" && "${{ inputs.security-update-only }}" == "false" ]]; then
             echo "Error: Both version-update-only and security-update-only are false. At least one must be true."
             exit 1
           fi
@@ -59,7 +59,6 @@ jobs:
     needs: check-type-update
     outputs:
       release-branch: ${{ steps.get-branch.outputs.release_branch }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,13 +70,13 @@ jobs:
           git fetch --no-tags --prune --depth=5 origin '+refs/heads/release/*:refs/remotes/origin/release/*'
 
       - name: Get release branch assigned to GitHub output
+        id: get-branch
         run: |
           echo "release_branch=$(git branch -r | grep 'origin/release/' | sed 's/origin\///' | jq -R -s -c 'split("\n")[:-1]' | head -255)" >> $GITHUB_OUTPUT
-        id: get-branch
 
   version-update:
     needs: get-release-branch
-    if: jobs.check-type-update.outputs.run_version_update == 'true'
+    if: ${{ needs.check-type-update.outputs.run_version_update == 'true' }}
     runs-on: ${{ inputs.runner }}
     strategy:
       matrix:
@@ -110,7 +109,7 @@ jobs:
 
   security-update:
     needs: get-release-branch
-    if: jobs.check-type-update.outputs.run_security_update == 'true'
+    if: ${{ needs.check-type-update.outputs.run_security_update == 'true' }}
     runs-on: ${{ inputs.runner }}
     strategy:
       matrix:
