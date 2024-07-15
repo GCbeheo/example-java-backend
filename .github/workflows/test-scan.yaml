@@ -1,4 +1,4 @@
-name: Custom scan dependabot using re-use workflow
+name: Custom scan dependabot using reusable workflow
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions: write-all
 jobs:
   dependabot-scan:
     name: Run scan for each release
-    uses: GCbeheo/example-java-backend/.github/actions/dependabot-workflow@release/check-2
+    uses: GCbeheo/example-java-backend/.github/workflows/dependabot-workflow.yaml@release/check-2
     with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       runner: ubuntu-latest
