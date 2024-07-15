@@ -16,9 +16,11 @@ on:
       version-update-only:
         required: false
         type: boolean
+        default: null
       security-update-only:
         required: false
         type: boolean
+        default: null
 
 jobs:
   check-type-update:
@@ -30,8 +32,8 @@ jobs:
       - name: Validate input flags
         id: validate
         run: |
-          run_version_update=${{ inputs.version-update-only }}
-          run_security_update=${{ inputs.security-update-only }}
+          run_version_update=false
+          run_security_update=false
           
           if [[ "${{ inputs.version-update-only }}" == "true" ]]; then
             run_version_update=true
@@ -41,7 +43,7 @@ jobs:
             run_security_update=true
           fi
           
-          if [[ "${{ inputs.version-update-only }}" == "" && "${{ inputs.security-update-only }}" == "" ]]; then
+          if [[ "${{ inputs.version-update-only }}" == "null" && "${{ inputs.security-update-only }}" == "null" ]]; then
             run_version_update=true
             run_security_update=true
           fi
