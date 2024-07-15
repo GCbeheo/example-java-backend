@@ -26,8 +26,8 @@ jobs:
   check-type-update:
     runs-on: ubuntu-latest
     outputs:
-      run-version-update: ${{ steps.validate.outputs.run_version_update }}
-      run-security-update: ${{ steps.validate.outputs.run_security_update }}
+      run_version_update: ${{ steps.validate.outputs.run_version_update }}
+      run_security_update: ${{ steps.validate.outputs.run_security_update }}
     steps:
       - name: Echo input
         run: |
