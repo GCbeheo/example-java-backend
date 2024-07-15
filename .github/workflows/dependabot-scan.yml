@@ -34,7 +34,7 @@ jobs:
           echo "version-update-only=${{ inputs.version-update-only }}"
           echo "security-update-only=${{ inputs.security-update-only }}"
 
-      - name: Validate input flags
+      - name: Check type update
         id: validate
         run: |
           run_version_update=false
@@ -52,6 +52,9 @@ jobs:
             echo "Error: Both version-update-only and security-update-only are false. At least one must be true."
             exit 1
           fi
+          
+          echo $run_version_update
+          echo $run_security_update
           
           echo "run_version_update=${run_version_update}" >> $GITHUB_OUTPUT
           echo "run_security_update=${run_security_update}" >> $GITHUB_OUTPUT
