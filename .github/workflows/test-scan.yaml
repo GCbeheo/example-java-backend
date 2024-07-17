@@ -21,9 +21,11 @@ jobs:
   dependabot-scan:
     name: Run scan for each release
     needs: get-github-token
-    uses: ./.github/workflows/dependabot-workflow.yaml
+    uses: ./.github/workflows/dependabot-scan.yaml
     secrets: inherit
     with:
       github-token: ${{ needs.get-github-token.outputs.token }}
       runner: ubuntu-latest
       package: maven
+      version-update-only: true
+      security-update-only: true
