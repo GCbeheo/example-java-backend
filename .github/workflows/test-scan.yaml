@@ -1,9 +1,6 @@
 name: Custom scan dependabot using reusable workflow
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 permissions: write-all
