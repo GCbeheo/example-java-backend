@@ -6,15 +6,15 @@ on:
 permissions: write-all
 
 jobs:
-  get-github-token:
-    runs-on: ubuntu-latest
-    outputs:
-      token: ${{ steps.get-token.outputs.token }}
-    steps:
-      - name: Get github access token
-        id: get-token
-        run: |
-          echo "token=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+#  get-github-token:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      token: ${{ steps.get-token.outputs.token }}
+#    steps:
+#      - name: Get github access token
+#        id: get-token
+#        run: |
+#          echo "token=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
 
   dependabot-scan:
     name: Run scan for each release
@@ -22,7 +22,7 @@ jobs:
     uses: ./.github/workflows/dependabot-scan.yaml
     secrets: inherit
     with:
-      github-token: ${{ needs.get-github-token.outputs.token }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
       repository: ${{ github.repository }}
       runner: ubuntu-latest
       package: maven
