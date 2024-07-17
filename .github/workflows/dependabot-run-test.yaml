@@ -6,7 +6,6 @@ on:
 jobs:
   get-release-branch:
     runs-on: ubuntu-latest
-    needs: check-type-update
     outputs:
       release-branch: ${{ steps.get-branch.outputs.release_branch }}
 
