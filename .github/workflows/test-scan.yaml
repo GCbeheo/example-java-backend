@@ -14,7 +14,7 @@ jobs:
       - name: Get github access token
         id: get-token
         run: |
-          echo "token=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_OUTPUT
+          echo "token=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
 
   dependabot-scan:
     name: Run scan for each release
@@ -23,6 +23,7 @@ jobs:
     secrets: inherit
     with:
       github-token: ${{ needs.get-github-token.outputs.token }}
+      repository: ${{ github.repository }}
       runner: ubuntu-latest
       package: maven
       version-update-only: true

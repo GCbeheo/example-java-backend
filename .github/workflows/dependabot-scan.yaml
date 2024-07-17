@@ -6,6 +6,9 @@ on:
       github-token:
         required: true
         type: string
+      repository:
+        required: true
+        type: string
       runner:
         required: false
         type: string
@@ -105,7 +108,7 @@ jobs:
       - name: Scan version update with package maven
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ inputs.github-token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY: ${{ inputs.repository }}
           PACKAGE_MANAGER: ${{ inputs.package }}
         run: |
           cd dependabot-core
@@ -138,7 +141,7 @@ jobs:
       - name: Scan security update with package maven
         env:
           LOCAL_GITHUB_ACCESS_TOKEN: ${{ inputs.github-token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REPOSITORY: ${{ inputs.repository }}
           PACKAGE_MANAGER: ${{ inputs.package }}
         run: |
           cd dependabot-core
