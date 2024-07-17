@@ -8,10 +8,22 @@ on:
 permissions: write-all
 
 jobs:
+  get-github-token:
+    runs-on: ubuntu-latest
+    outputs:
+      token: ${{ steps.get-token.outputs.token }}
+    steps:
+      - name: Get github access token
+        id: get-token
+        run: |
+          echo "token=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+
   dependabot-scan:
     name: Run scan for each release
-    uses: GCbeheo/example-java-backend/.github/workflows/dependabot-workflow.yaml@release/check-2
+    needs: get-github-token
+    uses: ./.github/workflows/dependabot-workflow.yaml
+    secrets: inherit
     with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+      github-token: ${{ needs.get-github-token.outputs.token }}
       runner: ubuntu-latest
       package: maven
